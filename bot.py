@@ -5,7 +5,7 @@ import telegram
 import os
 import re
 import randfacts
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup as bs4
 from urllib.request import urlopen
 import random
 import json
@@ -141,7 +141,7 @@ def data(bot, update):
 def facts(bot,update):
     #fact = randfacts.getFact()
     #update.message.reply_text(fact)
-    data = req.get("https://fungenerators.com/random/facts/").content
+    data = requests.get("https://fungenerators.com/random/facts/").content
     soup = bs4(data,"html5lib")
     fact = soup.find("h2",attrs = {'class':"wow fadeInUp animated"})
     update.message.reply_text("Fact source : https://fungenerators.com/random/facts/\n"+fact.text)
