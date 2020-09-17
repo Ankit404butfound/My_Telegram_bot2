@@ -142,9 +142,10 @@ def facts(bot,update):
     #fact = randfacts.getFact()
     #update.message.reply_text(fact)
     try:
-      data = requests.get("https://fungenerators.com/random/facts/").content
+      data = req.get("https://www.generatormix.com/random-facts-generator").content
       soup = bs4(data)
-      fact = soup.find("h2",attrs = {'class':"wow fadeInUp animated"})
+      fact = soup.find("blockquote",attrs = {'class':"text-left"})
+     # print((fact.text))
       update.message.reply_text(fact.text)
     except Exception as e:
       update.message.reply_text(str(e))
