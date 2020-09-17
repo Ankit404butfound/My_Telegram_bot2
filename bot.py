@@ -120,7 +120,7 @@ def check_bday():
 
 def start(bot,update):#(update, context):
     """Send a message when the command /start is issued."""
-    update.message.reply_text('Hi!')
+    update.message.reply_text('Hi from Bot2!')
 
 def help(bot,update):#(update, context):
     """Send a message when the command /help is issued."""
