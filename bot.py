@@ -119,6 +119,7 @@ def check_bday():
                                                       
 def answer_question(bot,update):
     cond = True
+    count = 0
     msg = update.message.text
     query = msg.replace("/temme","")
     
@@ -134,6 +135,10 @@ def answer_question(bot,update):
     elif lent > 0:
 
         while cond:
+            count += 1
+            if count > 21:
+                update.message.reply_text("I failed to find any result.")
+                cond = False
             index = random.randint(0,lent-1)
             try:
                 update.message.reply_text(datalst[index]["Text"])
