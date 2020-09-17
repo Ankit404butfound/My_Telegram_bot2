@@ -146,7 +146,7 @@ def facts(bot,update):
       soup = bs4(data)
       fact = soup.find("blockquote",attrs = {'class':"text-left"})
      # print((fact.text))
-      update.message.reply_text("Testing\n"+fact.text)
+      update.message.reply_text(fact.text)
     except Exception as e:
       update.message.reply_text(str(e))
 
