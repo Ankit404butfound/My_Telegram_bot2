@@ -122,6 +122,7 @@ def answer_question(bot,update):
     count = 0
     msg = update.message.text
     query = msg.replace("/temme","")
+    query = query.strip()
     
     data = requests.get("https://api.duckduckgo.com/?q=%s&format=json&pretty=1"%query).json()
     datalst = data["RelatedTopics"]
