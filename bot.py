@@ -141,10 +141,13 @@ def data(bot, update):
 def facts(bot,update):
     #fact = randfacts.getFact()
     #update.message.reply_text(fact)
-    data = requests.get("https://fungenerators.com/random/facts/").content
-    soup = bs4(data,"html5lib")
-    fact = soup.find("h2",attrs = {'class':"wow fadeInUp animated"})
-    update.message.reply_text("Fact source : https://fungenerators.com/random/facts/\n"+fact.text)
+    try:
+      data = requests.get("https://fungenerators.com/random/facts/").content
+      soup = bs4(data,"html5lib")
+      fact = soup.find("h2",attrs = {'class':"wow fadeInUp animated"})
+      update.message.reply_text("Fact source : https://fungenerators.com/random/facts/\n"+fact.text)
+    except Exception as e:
+      update.message.reply_text(str(e))
 
 def echo(bot,update):#, context):
     """Echo the user message."""
