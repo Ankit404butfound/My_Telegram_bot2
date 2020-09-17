@@ -118,6 +118,7 @@ def check_bday():
         time.sleep(300)
                                                       
 def answer_question(bot,update):
+    cond = True
     msg = update.message.text
     query = msg.replace("/temme","")
     
@@ -137,8 +138,8 @@ def answer_question(bot,update):
             try:
                 update.message.reply_text(datalst[index]["Text"])
                 cond = False
-            except:
-                pass
+            except Exception as e:
+                update.message.reply_text("Please specify, what did you mean by %s?"%query)
 
     else:
         update.message.reply_text("Please specify, what did you mean by %s?"%query)
