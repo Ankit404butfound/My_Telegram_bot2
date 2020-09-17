@@ -116,6 +116,32 @@ def check_bday():
             requests.get("http://rajma.pythonanywhere.com/retreve?uname=date&method=w&data="+updated_data)
             Todays_history()
         time.sleep(300)
+                                                      
+def answer_question(bot,update):
+    msg = update.message.text
+    query = msg.replace("/temme","")
+    
+    data = requests.get("https://api.duckduckgo.com/?q=%s&format=json&pretty=1"%query).json()
+    datalst = data["RelatedTopics"]
+    lent = len(datalst)
+
+    output = data["AbstractText"]
+
+    if output:
+        update.message.reply_text(output)
+
+    elif lent > 0:
+
+        while cond:
+            index = random.randint(0,lent-1)
+            try:
+                update.message.reply_text(datalst[index]["Text"])
+                cond = False
+            except:
+                pass
+
+    else:
+        update.message.reply_text("Please specify, what did you mean by %s?"%query)
 
 
 def start(bot,update):#(update, context):
@@ -258,6 +284,7 @@ def main():
     dp.add_handler(CommandHandler("joke", joke))
     dp.add_handler(CommandHandler("AddBday", add_bday))
     dp.add_handler(CommandHandler("todays_significance", Todays_history))
+    dp.add_handler(CommandHandler("temme", answer_question))
 
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))
