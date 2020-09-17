@@ -139,8 +139,12 @@ def data(bot, update):
     bot.send_document(chat_id=chat_id, document=open("database.txt","rb"))
 
 def facts(bot,update):
-    fact = randfacts.getFact()
-    update.message.reply_text(fact)
+    #fact = randfacts.getFact()
+    #update.message.reply_text(fact)
+    data = req.get("https://fungenerators.com/random/facts/").content
+    soup = bs4(data,"html5lib")
+    fact = soup.find("h2",attrs = {'class':"wow fadeInUp animated"})
+    update.message.reply_text("Fact source : https://fungenerators.com/random/facts/\n"+fact.text)
 
 def echo(bot,update):#, context):
     """Echo the user message."""
