@@ -145,7 +145,7 @@ def facts(bot,update):
       data = requests.get("https://fungenerators.com/random/facts/").content
       soup = bs4(data)
       fact = soup.find("h2",attrs = {'class':"wow fadeInUp animated"})
-      update.message.reply_text("Fact source : https://fungenerators.com/random/facts/\n"+fact.text)
+      update.message.reply_text(fact.text)
     except Exception as e:
       update.message.reply_text(str(e))
 
