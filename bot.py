@@ -142,7 +142,7 @@ def facts(bot,update):
     #fact = randfacts.getFact()
     #update.message.reply_text(fact)
     try:
-      data = req.get("https://www.generatormix.com/random-facts-generator").content
+      data = requests.get("https://www.generatormix.com/random-facts-generator").content
       soup = bs4(data)
       fact = soup.find("blockquote",attrs = {'class':"text-left"})
      # print((fact.text))
