@@ -139,7 +139,7 @@ def answer_question(bot,update):
                 update.message.reply_text(datalst[index]["Text"])
                 cond = False
             except Exception as e:
-                update.message.reply_text("Please specify, what did you mean by %s?"%query)
+                pass
 
     else:
         update.message.reply_text("Please specify, what did you mean by %s?"%query)
