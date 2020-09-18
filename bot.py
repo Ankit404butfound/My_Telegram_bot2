@@ -135,7 +135,7 @@ def answer_question(bot,update):
     if output:
         update.message.reply_text(output)
     
-    elif query == "":
+    elif not query:
         file_id = random.choice(lst)
         bot.sendSticker(update.message.chat.id,file_id,reply_to_message_id=update.message.message_id)
 
