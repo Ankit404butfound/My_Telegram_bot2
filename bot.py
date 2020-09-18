@@ -125,7 +125,12 @@ def answer_question(bot,update):
     msg = update.message.text
     query = msg.replace("/temme","")
     query = query.strip()
-    
+                                                      
+    if query == "":
+        file_id = random.choice(lst)
+        bot.sendSticker(update.message.chat.id,file_id,reply_to_message_id=update.message.message_id)
+        return
+                                                                                                                                                          
     data = requests.get("https://api.duckduckgo.com/?q=%s&format=json&pretty=1"%query).json()
     datalst = data["RelatedTopics"]
     lent = len(datalst)
@@ -134,10 +139,6 @@ def answer_question(bot,update):
 
     if output:
         update.message.reply_text(output)
-    
-    elif query == "":
-        file_id = random.choice(lst)
-        bot.sendSticker(update.message.chat.id,file_id,reply_to_message_id=update.message.message_id)
 
     elif lent > 0:
 
