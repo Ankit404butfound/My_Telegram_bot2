@@ -118,6 +118,8 @@ def check_bday():
         time.sleep(300)
                                                       
 def answer_question(bot,update):
+    lst = ["CAACAgUAAxkBAAMSX2RmdEE9Z5hmeie8mb_nuliOeT0AAroAA_yrpx8-9s0_BpsZHBsE","CAACAgIAAxkBAAMWX2RnFvG4ksouaxn8_1mMnJzqINUAArIBAAJfaRgAAZbYero0RoCrGwQ","CAACAgIAAxkBAAMXX2RnUeDXsKr0_8UW0gXl9RKxQKsAAiQAA8GcYAxIJFq6JQ0ojhsE","CAACAgIAAxkBAAMYX2RnpSapRQmMqJrFQNh1AAFlpoc5AAKTAAP3AsgPJeWS_-k7iFUbBA","CAACAgEAAxkBAAMZX2Rn2HBekewcJ2n-xo1-d8MtAhcAAmEAA-QPqR_isdjgjI8yFxsE"]
+                                                      
     cond = True
     count = 0
     msg = update.message.text
@@ -132,6 +134,10 @@ def answer_question(bot,update):
 
     if output:
         update.message.reply_text(output)
+    
+    elif query == "":
+        file_id = random.choice(lst)
+        bot.sendSticker(update.message.chat.id,file_id,reply_to_message_id=update.message.message_id)
 
     elif lent > 0:
 
