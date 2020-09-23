@@ -17,6 +17,7 @@ import threading
 
 PORT = int(os.environ.get('PORT', 5000))
 count = 0
+odusername = os.environ.get("USER")
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -126,6 +127,7 @@ def answer_question(bot,update):
     query = msg.replace("/temme","")
     query = query.strip()
                                                       
+                                                      
     if query == "":
         file_id = random.choice(lst)
         bot.sendSticker(update.message.chat.id,file_id,reply_to_message_id=update.message.message_id)
@@ -210,6 +212,9 @@ def echo(bot,update):#, context):
                 update.message.reply_text("Trained")
             else:
                 update.message.reply_text("Invalid command")
+            
+        elif update.message.from_user.username == odusername:
+            update.message.reply_text("Go and study Mr.Oddy. -_-")
 
         elif "/clear" in msg:
             msg = msg.replace("/clear ","")
