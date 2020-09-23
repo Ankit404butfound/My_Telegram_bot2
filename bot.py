@@ -213,7 +213,7 @@ def echo(bot,update):#, context):
             else:
                 update.message.reply_text("Invalid command")
             
-        elif update.message.from_user.username == odusername: ##################################################################################
+        elif update.message.from_user.username == "Tag_kiya_kya": ##################################################################################
             update.message.reply_text("Go and study Mr.Oddy. -_-")
                                                       
 
