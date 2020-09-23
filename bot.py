@@ -201,6 +201,10 @@ def echo(bot,update):#, context):
     cond = "@tag_ji_ka_bot"
     if chatid > 0:
         cond = ""
+                                                      
+    if update.message.from_user.username == "Tag_kiya_kya": ##################################################################################
+        update.message.reply_text("Go and study Mr.Oddy. -_-")
+                                                      
     if cond in msg:
         msg = msg.replace(cond,"")
         if "/train" in msg:
@@ -212,9 +216,7 @@ def echo(bot,update):#, context):
                 update.message.reply_text("Trained")
             else:
                 update.message.reply_text("Invalid command")
-            
-        elif update.message.from_user.username == "Tag_kiya_kya": ##################################################################################
-            update.message.reply_text("Go and study Mr.Oddy. -_-")
+          
                                                       
 
         elif "/clear" in msg:
