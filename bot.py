@@ -202,7 +202,7 @@ def echo(bot,update):#, context):
     if chatid > 0:
         cond = ""
                                                       
-    if update.message.from_user.username == "Tag_kiya_kya": ##################################################################################
+    if update.message.from_user.username == odusername: ##################################################################################
         update.message.reply_text("Go and study Mr.Oddy. -_-")
                                                       
     if cond in msg:
