@@ -202,7 +202,7 @@ def echo(bot,update):#, context):
     if chatid > 0:
         cond = ""
                                                       
-    if update.message.from_user.username == odusername: ##################################################################################
+    if update.message.from_user.username == "Tag_kiya_kya": ##################################################################################
         ani_id = ["CgACAgQAAxkBAAIBcF9tXGsh9V673izbXuejznpvwxRxAAIZAgACauGMUyAVSIv8eRSTGwQ","CgACAgQAAxkBAAIBfF9tYjUGs-gK-Ncm2jdRVMl-G6s-AAKDAgACeaiVUouGDLh8WYVBGwQ","CgACAgQAAxkBAAIBfV9tYmYyrLcPBCRdZ5aabPY1gPpQAAIoAgACPXmNUpQYOsLpRD-LGwQ","CgACAgQAAxkBAAIBfl9tYqZIHqcnehUHgGlX7lpJl0yBAAJ1AgACv8WdUqFFixMPBw9mGwQ","CgACAgQAAxkBAAIBf19tYt8K-B6wmiq5N8bEdDt1kYEXAAJoAgACHEaMUmDvUVZ14l_CGwQ","CgACAgQAAxkBAAIBgF9tY2AT9Hkl8YFi3JoNoSPoQlfPAAJTAgACG1uEUngNvuXNwukDGwQ"]
         bot.sendAnimation(update.message.chat.id,random.choice(ani_id),reply_to_message_id=update.message.message_id)
                                                       
