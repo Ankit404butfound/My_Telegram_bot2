@@ -53,6 +53,7 @@ mybot = Bot(TOKEN)
 def getimg(case,col):
     global width,height,back
     img = cv2.imread("ChrImages/%s.png"%case)
+    img = np.array(img)
     img[np.where((img!=[255,255,255]).all(axis=2))] = col
     cv2.imwrite("ChrImages/chr.png",img)
     cases = Image.open("ChrImages/chr.png")
@@ -123,6 +124,7 @@ def mytexttohand(bot,update):
     def getimg(case,col):
         global width,height,back
         img = cv2.imread("ChrImages/%s.png"%case)
+        img = np.array(img)
         img[np.where((img!=[255,255,255]).all(axis=2))] = col
         cv2.imwrite("ChrImages/chr.png",img)
         cases = Image.open("ChrImages/chr.png")
