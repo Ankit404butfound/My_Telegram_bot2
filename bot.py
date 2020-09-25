@@ -52,11 +52,11 @@ mybot = Bot(TOKEN)
 ###########################################################################################################################################################################
 def getimg(case,col):
     global width,height,back
-    img = cv2.imread("ChrImages/%s.png"%case)
+    img = cv2.imread(r"ChrImages\%s.png"%case)
 #     img = np.array(img)
 #     img[np.where((img!=[255,255,255]).all(axis=0))] = col
-    cv2.imwrite("ChrImages/chr.png",img)
-    cases = Image.open("ChrImages/chr.png")
+    cv2.imwrite(r"ChrImages\chr.png",img)
+    cases = Image.open(r"ChrImages\chr.png")
     back.paste(cases,(width,height))
     newwidth = cases.width
     width = width + newwidth
@@ -123,11 +123,11 @@ def mytexttohand(bot,update):
 
     def getimg(case,col):
         global width,height,back
-        img = cv2.imread("ChrImages/%s.png"%case)
+        img = cv2.imread(r"ChrImages\%s.png"%case)
 #         img = np.array(img)
 #         img[np.where((img!=[255,255,255]).all(axis=0))] = col
-        cv2.imwrite("ChrImages/chr.png",img)
-        cases = Image.open("ChrImages/chr.png")
+        cv2.imwrite(r"ChrImages\chr.png",img)
+        cases = Image.open(r"ChrImages\chr.png")
         back.paste(cases,(width,height))
         newwidth = cases.width
         width = width + newwidth
@@ -140,7 +140,7 @@ def mytexttohand(bot,update):
         try:
             global arr, width, height, back
             #rgb.reverse() not working, IDK why.
-            back = Image.open("ChrImages\zback.png")
+            back = Image.open(r"ChrImages\zback.png")
             rgb = [rgb[2],rgb[1],rgb[0]]
             count = -1
             lst = string.split()
@@ -191,7 +191,7 @@ def mytexttohand(bot,update):
 
     else:
         update.message.reply_text("Please wait, processing your request, this will take few moments...")
-        if not os.path.exists("ChrImages\zback.png"):
+        if not os.path.exists(r"ChrImages\zback.png"):
             time.sleep(2)
             update.message.reply_text("Just a bit more...")
             download()
