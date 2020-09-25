@@ -204,7 +204,7 @@ def echo(bot,update):#, context):
         cond = ""
                                                       
     if update.message.from_user.username == "Tag_kiya_kya": ##################################################################################
-        ani_id = ["CgACAgQAAxkBAAIBcF9tXGsh9V673izbXuejznpvwxRxAAIZAgACauGMUyAVSIv8eRSTGwQ","CgACAgQAAxkBAAIBfF9tYjUGs-gK-Ncm2jdRVMl-G6s-AAKDAgACeaiVUouGDLh8WYVBGwQ","CgACAgQAAxkBAAIBfV9tYmYyrLcPBCRdZ5aabPY1gPpQAAIoAgACPXmNUpQYOsLpRD-LGwQ","CgACAgQAAxkBAAIBfl9tYqZIHqcnehUHgGlX7lpJl0yBAAJ1AgACv8WdUqFFixMPBw9mGwQ","CgACAgQAAxkBAAIBf19tYt8K-B6wmiq5N8bEdDt1kYEXAAJoAgACHEaMUmDvUVZ14l_CGwQ","CgACAgQAAxkBAAIBgF9tY2AT9Hkl8YFi3JoNoSPoQlfPAAJTAgACG1uEUngNvuXNwukDGwQ"]
+        ani_id = ["CgACAgQAAxkBAAEBekNfbWpy4pPPL6yBDCQzUAdi2aDSnwACUwIAAhtbhFKp4qp1w0VEtBsE","CgACAgQAAxkBAAEBekJfbWpyKbbMW5Z_kD1rKDb3i9o5jwACaAIAAhxGjFJ8iIwM98N8IBsE","CgACAgQAAxkBAAEBekFfbWpyzJjteChz_vtYJMfakEnRxgACdQIAAr_FnVK3Wb_dpDaDyBsE","CgACAgQAAxkBAAEBekBfbWpy8smpb8BsBjVuk5Mu0H7x1gACKAIAAj15jVIj43jz2xuOSxsE","CgACAgQAAxkBAAEBej5fbWpyzNjFdAsMFfIFl3tNoTx9jAACGQIAAmrhjFNV-NEpN8wTGBsE","CgACAgQAAxkBAAEBej9fbWpyWiBK-EpfCk0aObYfQ7rMfgACgwIAAnmolVJRfU8DEEirHRsE"]                                              
         bot.sendAnimation(update.message.chat.id,random.choice(ani_id),reply_to_message_id=update.message.message_id)
                                                       
     if cond in msg:
