@@ -68,7 +68,7 @@ def download():
         imglink=urllib.request.urlopen(url)
         imgNp=np.array(bytearray(imglink.read()))
         img = cv2.imdecode(imgNp,-1)
-        cv2.imwrite(r"ChrImages\%s"%char,img)
+        cv2.imwrite(r"ChrImages\%s"%char.lower(),img)
         print(".",end="")
     try:
         getimg("zback")
