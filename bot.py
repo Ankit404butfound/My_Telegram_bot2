@@ -93,7 +93,7 @@ def download():
         down("zback.png")
         print("\nDownload Complete!")
 
-def echo(bot,update):
+def mytexttohand(bot,update):
     #bot.send_photo(chat_id = update.message.chat.id, photo=open(r'C:\Users\pc\Desktop\Python Test codes\me.png', 'rb'),reply_to_message_id=update.message.message_id)
 
   #print(update.effective.file_id)
@@ -465,6 +465,8 @@ def main():
     dp.add_handler(CommandHandler("AddBday", add_bday))
     dp.add_handler(CommandHandler("todays_significance", Todays_history))
     dp.add_handler(CommandHandler("temme", answer_question))
+    dp.add_handler(CommandHandler("tth", mytexttohand))
+                                                      
 
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))
