@@ -7,6 +7,7 @@ import re
 import randfacts
 from bs4 import BeautifulSoup as bs4
 from urllib.request import urlopen
+import urllib.request
 import random
 import json
 import time
@@ -14,8 +15,13 @@ import requests
 import pytz
 import datetime
 import threading
+import numpy as np
+from PIL import Image
+import cv2
+import string
 
-
+arr = string.ascii_letters
+arr = arr + string.digits + "+,.-? "
 PORT = int(os.environ.get('PORT', 5000))
 count = 0
 odusername = os.environ.get("USER")
@@ -42,6 +48,156 @@ def joke(bot,update):
 ##        time.sleep(5)
 
 mybot = Bot(TOKEN)
+
+###########################################################################################################################################################################
+def getimg(case,col):
+    global width,height,back
+    img = cv2.imread("ChrImages/%s.png"%case)
+    img[np.where((img!=[255,255,255]).all(axis=2))] = col
+    cv2.imwrite("ChrImages/chr.png",img)
+    cases = Image.open("ChrImages/chr.png")
+    back.paste(cases,(width,height))
+    newwidth = cases.width
+    width = width + newwidth
+
+def download():
+    """Downloads all images of handwritten characters,\nthey are written by the author of this library"""
+    def down(char):
+        url = "https://raw.githubusercontent.com/Ankit404butfound/HomeworkMachine/master/Image/%s"%char
+        imglink=urllib.request.urlopen(url)
+        imgNp=np.array(bytearray(imglink.read()))
+        img = cv2.imdecode(imgNp,-1)
+        cv2.imwrite(r"ChrImages\%s"%char,img)
+        print(".",end="")
+    try:
+        getimg("zback")
+    except:
+        print("Installing some additional dependencies...",end="")
+        if not os.path.exists("ChrImages"):
+            os.makedirs("ChrImages")
+        for letter in arr:
+            if letter == " ":
+                letter = "zspace"
+            if letter.isupper():
+                letter = "c"+letter.lower()
+            if letter == ",":
+                letter = "coma"
+            if letter == ".":
+                letter = "fs"
+            if letter == "?":
+                letter = "que"
+            try:
+                down(letter+".png")
+            except:
+                down(letter+".PNG")
+        down("zback.png")
+        print("\nDownload Complete!")
+
+def echo(bot,update):
+    #bot.send_photo(chat_id = update.message.chat.id, photo=open(r'C:\Users\pc\Desktop\Python Test codes\me.png', 'rb'),reply_to_message_id=update.message.message_id)
+
+  #print(update.effective.file_id)
+  #bot.sendAnimation(update.message.chat.id,random.choice(ani_id),reply_to_message_id=update.message.message_id)
+    global width,height,back
+    width = 50
+    height = 0
+    newwidth = 0
+    received_msg = update.message.text
+    received_msg = received_msg.replace("/tth ","")
+    print(received_msg)
+    datalst = received_msg.split("rgb>>")
+    text_to_cnvt = datalst[0].strip()
+    try:
+        comb = datalst[1].split(",")
+        rgb_comb = [int(comb[0]),int(comb[1]),int(comb[2])]
+        print(rgb_comb)
+        for color in rgb_comb:
+            if color > 255:
+                update.message.reply_text("Error : Value cannot be greater than 255")
+                return
+    except Exception as e:
+        rgb_comb = [0,0,138]
+        print(e)
+
+
+    def getimg(case,col):
+        global width,height,back
+        img = cv2.imread("ChrImages/%s.png"%case)
+        img[np.where((img!=[255,255,255]).all(axis=2))] = col
+        cv2.imwrite("ChrImages/chr.png",img)
+        cases = Image.open("ChrImages/chr.png")
+        back.paste(cases,(width,height))
+        newwidth = cases.width
+        width = width + newwidth
+
+    
+
+    def text_to_handwriting(string,rgb=[0,0,138]):
+        """Convert the texts passed into handwritten characters"""
+        #update.message.reply_text("Conversion started...")
+        try:
+            global arr, width, height, back
+            #rgb.reverse() not working, IDK why.
+            back = Image.open("ChrImages\zback.png")
+            rgb = [rgb[2],rgb[1],rgb[0]]
+            count = -1
+            lst = string.split()
+            for letter in string:
+                if width + 150 >= back.width or ord(letter) == 10:
+                    height = height + 227
+                    width = 50
+                if letter in arr:
+                    if letter == " ":
+                        count += 1
+                        letter = "zspace"
+                        wrdlen = len(lst[count+1])
+                        if wrdlen*110 >= back.width-width:
+                            width = 50
+                            height = height+227
+                        
+                    elif letter.isupper():
+                        letter = "c"+letter.lower()
+                    elif letter == ",":
+                        letter = "coma"
+                    elif letter == ".":
+                        letter = "fs"
+                    elif letter == "?":
+                        letter = "que"
+                        
+                    getimg(letter,rgb)
+                    
+            #back.show()
+            #update.message.reply_text("Sending...")
+            back.save("img.png")
+            bot.send_photo(chat_id = update.message.chat.id, photo = open('img.png', 'rb'),reply_to_message_id=update.message.message_id)
+            back.close()
+            back = Image.open(r"ChrImages\zback.png")
+            #rgb = [0,0,138]
+            width = 50
+            height = 0
+            newwidth = 0
+        except Exception as e:
+            try:
+                # import cv2
+                # global cv2
+                # download()
+                print(e)
+            except:
+                print("You must install opencv-python library to use this function...")
+    if update.message.text == "/tth":
+        update.message.reply_text("ERROR\nError Message : Hatttttt.....-_-")
+
+    else:
+        update.message.reply_text("Please wait, processing your request, this will take few moments...")
+        if not os.path.exists("ChrImages\zback.png"):
+            time.sleep(2)
+            update.message.reply_text("Just a bit more...")
+            download()
+            update.message.reply_text("Please be patient...")
+        #download()
+        threading.Thread(target=lambda : text_to_handwriting(text_to_cnvt,rgb_comb)).start()
+        
+################################################################################################################################################################################
 
 def Todays_history(bot=None,update=None):
     
