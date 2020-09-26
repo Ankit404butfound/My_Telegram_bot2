@@ -326,6 +326,7 @@ def start(bot,update):#(update, context):
 def help(bot,update):#(update, context):
     """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
+                                                      
 
 def what_do_you_think(bot,update):
     contents = requests.get('https://yesno.wtf/api').json()
