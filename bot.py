@@ -639,8 +639,8 @@ def new_word_game(bot,update):
         group_lst.append(group_id)
         dp.add_handler(CommandHandler("join_word_game",new_game.join))
         dp.add_handler(CommandHandler("start_word_game",new_game.start_game))
-        dp.dispatcher.add_handler(CommandHandler("w",new_game.word))
-        dp.dispatcher.add_handler(CommandHandler("end_game",new_game.end))
+        dp.add_handler(CommandHandler("w",new_game.word))
+        dp.add_handler(CommandHandler("end_game",new_game.end))
         update.message.reply_text("Starting new game\nType /join_word_game to join.")
     else:
         update.message.reply_text("A game is already running")
