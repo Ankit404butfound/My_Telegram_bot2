@@ -20,7 +20,7 @@ import numpy as np
 from PIL import Image
 import cv2
 import string
-import enchant
+#import enchant
 
 arr = string.ascii_letters
 arr = arr + string.digits + "+,.-? "
@@ -451,7 +451,7 @@ def echo(bot,update):#, context):
     #logger.warning('Update "%s" caused error "%s"', update, context.error)
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 group_lst = []
-word = enchant.Dict("en_US")
+#word = enchant.Dict("en_US")
 class WordGame:
     def __init__(self,GROUP):
         self.GROUP = GROUP
@@ -554,7 +554,9 @@ class WordGame:
                 prev_word = self.used_word_lst[total_words-1]
                 prev_let = prev_word[len(prev_word)-1]
                 print(message[0])
-                if word.check(message) and message[0] == prev_let and message.lower() not in self.used_word_lst:
+                word_check = requests.get("http://rajma.pythonanywhere.com/check?word="+message)
+                
+                if word.check == "True" and message[0] == prev_let and message.lower() not in self.used_word_lst:
                     bot.sendMessage(self.GROUP,text=f"{mention_markdown(chat_id,name)} chose '{message.upper()}' which is a valid English word\nThey earned {points} points.",parse_mode="Markdown")
                     score = self.user_point_dic[chat_id]
                     self.user_point_dic[chat_id] = points + score
