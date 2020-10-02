@@ -4,6 +4,7 @@ from telegram import Update, Bot
 from telegram.utils.helpers import mention_markdown
 import telegram
 import os
+
 import re
 import randfacts
 from bs4 import BeautifulSoup as bs4
@@ -475,7 +476,7 @@ def main():
     dp.add_handler(CommandHandler("todays_significance", Todays_history))
     dp.add_handler(CommandHandler("temme", answer_question))
     dp.add_handler(CommandHandler("tth", mytexttohand))
-    dp.add_handler(CommandHandler('new_word_game', new_word_game))
+    #dp.add_handler(CommandHandler('new_word_game', new_word_game))
                                                       
 
     # on noncommand i.e message - echo the message on Telegram
