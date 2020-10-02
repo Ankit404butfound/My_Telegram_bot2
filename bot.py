@@ -637,16 +637,18 @@ def new_word_game(bot,update):
     if group_id not in group_lst:
         new_game = WordGame(group_id)
         group_lst.append(group_id)
-        updater.dispatcher.add_handler(CommandHandler("join_word_game",new_game.join))
-        updater.dispatcher.add_handler(CommandHandler("start_word_game",new_game.start_game))
-        updater.dispatcher.add_handler(CommandHandler("w",new_game.word))
-        updater.dispatcher.add_handler(CommandHandler("end_game",new_game.end))
+        dp.add_handler(CommandHandler("join_word_game",new_game.join))
+        dp.add_handler(CommandHandler("start_word_game",new_game.start_game))
+        dp.dispatcher.add_handler(CommandHandler("w",new_game.word))
+        dp.dispatcher.add_handler(CommandHandler("end_game",new_game.end))
         update.message.reply_text("Starting new game\nType /join_word_game to join.")
     else:
         update.message.reply_text("A game is already running")
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+dp = ""
 def main():
     """Start the bot."""
+    global dp
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
