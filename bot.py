@@ -644,7 +644,204 @@ def new_word_game(bot,update):
 
 
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$#$%$#%$^%$^%^RTYHBGRTGBHY^RTBHU&^^^^^^^^^JJJJVBN JT^&^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+group_lst = []
+math_GROUP = ""
+math_username_lst = []
+math_chatid_lst = []
+math_name_lst = []
+math_whose_chance = 0
+math_user_num = 0
+math_round_com = 1
+math_user_lst = []
+math_game_started = False
+math_math_start_time = 0
+math_end_time = 0
+user_point_dic = {}
+result = -1
 
+def end_math_game(bot,update):
+    global group_lst,math_GROUP,math_username_lst,math_chatid_lst,math_name_lst,math_whose_chance,used_word_lst,math_user_num,math_round_com,math_user_lst,math_game_started,math_math_start_time,math_end_time,user_point_dic
+
+    final_score = "Final score is as followed"
+    bot.sendMessage(math_GROUP,"Game ENDED!!!")
+    for i in range(len(math_chatid_lst)):
+        user = math_name_lst[i]
+        score = user_point_dic[math_chatid_lst[i]]
+        final_score = f"{final_score}\n{mention_markdown(math_chatid_lst[i],user)} : {score}"
+    bot.sendMessage(math_GROUP,final_score,parse_mode="Markdown")
+    math_GROUP = ""
+    math_username_lst = []
+    math_chatid_lst = []
+    math_name_lst = []
+    math_whose_chance = 0
+    math_user_num = 0
+    math_round_com = 1
+    math_user_lst = []
+    math_game_started = False
+    math_math_start_time = 0
+    math_end_time = 0
+    user_point_dic = {}
+    group_lst = []
+
+
+def chose():
+    num_1 = random.randint(1,100)
+    num_2 = random.randint(1,100)
+    return num_1, num_2
+
+def join_math_game(bot,update):
+    username = update.message.from_user.username
+    name = update.message.from_user.first_name
+    chat_id = update.message.from_user.id
+    if group_lst != []:
+        if chat_id not in math_chatid_lst:
+            math_user_lst.append(f"{name}:{username}:{chat_id}")
+            math_username_lst.append(username)
+            math_chatid_lst.append(chat_id)
+            math_name_lst.append(name)
+            user_point_dic[chat_id] = 0
+            bot.sendMessage(math_GROUP,text=f"{mention_markdown(chat_id,name)} joined the game, there are currently {len(math_user_lst)} players.",parse_mode="Markdown")
+
+        else:
+            update.message.reply_text("You have already joined the game")
+    else:
+        update.message.reply_text("No running game in this group.")
+
+def solution(bot,update):
+    global group_lst,math_GROUP,math_username_lst,math_chatid_lst,math_name_lst,math_whose_chance,used_word_lst,math_user_num,math_round_com,math_user_lst,math_game_started,math_start_time,math_end_time,user_point_dic
+    chat_id = update.message.from_user.id
+    name = update.message.from_user.first_name
+    if math_whose_chance == chat_id:
+        math_end_time = time.time()
+        total_time = math_end_time - math_start_time
+        message = update.message.text
+        message = message.replace("/s ","").strip()
+        total_time = round(total_time)
+        points = 20 - total_time
+        if message == "_pass":
+            bot.sendMessage(math_GROUP,text=f"{mention_markdown(chat_id,name)} loses 5 points.",parse_mode="Markdown")
+            score = user_point_dic[chat_id]
+            user_point_dic[chat_id] = score - 5
+            math_end_time = 0
+            math_start_time = 0
+
+        elif points < 0:
+            bot.sendMessage(math_GROUP,text=f"{mention_markdown(chat_id,name)} loses 5 points as 20 seconds have passed.",parse_mode="Markdown")
+            score = user_point_dic[chat_id]
+            user_point_dic[chat_id] = score - 5
+            math_end_time = 0
+            math_start_time = 0
+
+        else:
+            try:
+                message = int(message)
+                if message == result:
+                    bot.sendMessage(math_GROUP,text=f"{mention_markdown(chat_id,name)} answered '{message}' which is correct\nThey earned {points} points.",parse_mode="Markdown")
+                    score = user_point_dic[chat_id]
+                    user_point_dic[chat_id] = points + score
+                    #print(user_point_dic)
+                    math_end_time = 0
+                    math_start_time = 0
+
+                else:
+                    bot.sendMessage(math_GROUP,text=f"{mention_markdown(chat_id,name)} answered '{message}' which is incorrect\nThey loses {points} points\nCorrect answer is {result}.",parse_mode="Markdown")
+                    score = user_point_dic[chat_id]
+                    user_point_dic[chat_id] = score - points
+                    math_end_time = 0
+                    math_start_time = 0
+                
+
+            except:
+                bot.sendMessage(math_GROUP,text=f"{mention_markdown(chat_id,name)} loses 5 points as {message} is not a number",parse_mode="Markdown")
+
+        math_whose_chance = 0
+        final_score = ""
+        for i in range(len(math_chatid_lst)):
+            user = math_name_lst[i]
+            score = user_point_dic[math_chatid_lst[i]]
+            final_score = f"{final_score}\n{mention_markdown(math_chatid_lst[i],user)} : {score}"
+        bot.sendMessage(math_GROUP,final_score,parse_mode="Markdown")
+        time.sleep(2)
+        incriment_game(bot,update)
+
+def incriment_game(bot,update):
+    global math_whose_chance, math_start_time, math_user_num, math_round_com, result
+    name = math_name_lst[math_user_num]
+    chat_id = math_chatid_lst[math_user_num]
+    #total_words = len(used_word_lst)
+    math_whose_chance = chat_id
+    
+    math_whose_chance = math_chatid_lst[math_user_num]
+    choice = random.randint(1,3)
+    chat_id = math_chatid_lst[math_user_num]
+    chance_msg = f"""{mention_markdown(chat_id,name+"'s")} chance"""
+    result = -1
+    if choice == 1:
+        #print()
+        #num = chose()
+        num_1,num_2 = chose()
+        result = num_1 + num_2
+        response = f"What is {num_1} + {num_2}?"
+        
+        
+    elif choice == 2:
+        #print()
+        while result < 0:
+            num_1,num_2 = chose()
+            result = num_1 - num_2
+            response = f"What is {num_1} - {num_2}?"
+            
+
+    else:
+        #print()
+        num_1 = random.randint(1,11)
+        num_2,_ = chose()
+        result = num_1 * num_2
+        response = f"What is {num_1} × {num_2}?"
+
+
+    bot.sendMessage(math_GROUP,f"""*---MATH GAME {math_round_com}---*\n\n{mention_markdown(chat_id,name+"'s")} chance\n\n{response}\nReply like this - /s SOLUTION.""",parse_mode="Markdown")
+    math_start_time = time.time()
+    math_user_num = math_user_num+1
+    math_round_com = math_round_com+1
+    if len(math_chatid_lst)-1 < math_user_num:
+        math_user_num = 0
+            
+    
+def start_math_game(bot,update):
+    global math_game_started
+    total_players = len(math_user_lst)
+
+    if not math_game_started:
+    
+        if total_players > 1:
+            bot.sendMessage(math_GROUP,f"Starting a game with {total_players} players")
+            math_game_started = True
+            incriment_game(bot=bot,update=update)
+
+        else:
+             update.message.reply_text("Game must have atleast 2 players.")
+
+    else:
+        update.message.reply_text("Game has already started")
+
+def new_math_game(bot,update):
+    global math_GROUP
+    group_id = update.message.chat_id
+    if group_id not in group_lst:
+        math_GROUP = group_id
+        group_lst.append(group_id)
+        dp.add_handler(CommandHandler("join_math_game",join_math_game))
+        dp.add_handler(CommandHandler("start_math_game",start_math_game))
+        dp.add_handler(CommandHandler("s",solution))
+        dp.add_handler(CommandHandler("end_math_game",end_math_game))
+        update.message.reply_text("Starting new game\nType /join_math_game to join.")
+    else:
+        update.message.reply_text("A game is already running")
+
+
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 def main():
     global dp
     """Start the bot."""
@@ -669,6 +866,7 @@ def main():
     dp.add_handler(CommandHandler("temme", answer_question))
     dp.add_handler(CommandHandler("tth", mytexttohand))
     dp.add_handler(CommandHandler('new_word_game', new_word_game))
+    dp.add_handler(CommandHandler('new_math_game', new_math_game))
                                                       
 
     # on noncommand i.e message - echo the message on Telegram
