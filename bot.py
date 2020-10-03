@@ -467,7 +467,7 @@ start_time = 0
 end_time = 0
 user_point_dic = {}
 
-def end(bot,update):
+def end_word_game(bot,update):
     global group_lst,GROUP,username_lst,chatid_lst,name_lst,whose_chance,used_word_lst,user_num,round_com,user_lst,game_started,start_time,end_time,user_point_dic
 
     final_score = "Final score is as followed"
@@ -493,7 +493,7 @@ def end(bot,update):
     group_lst = []
 
 
-def join(bot,update):
+def join_word_game(bot,update):
     username = update.message.from_user.username
     name = update.message.from_user.first_name
     chat_id = update.message.from_user.id
@@ -509,7 +509,7 @@ def join(bot,update):
         update.message.reply_text("You have already joined the game")
 
 
-def start_game(bot,update):
+def start_word_game(bot,update):
     global game_started
     total_players = len(user_lst)
 
@@ -634,10 +634,10 @@ def new_word_game(bot,update):
     if group_id not in group_lst:
         GROUP = group_id
         group_lst.append(group_id)
-        dp.add_handler(CommandHandler("join_word_game",join))
-        dp.add_handler(CommandHandler("start_word_game",start_game))
+        dp.add_handler(CommandHandler("join_word_game",join_word_game))
+        dp.add_handler(CommandHandler("start_word_game",start_word_game))
         dp.add_handler(CommandHandler("w",word))
-        dp.add_handler(CommandHandler("end_game",end))
+        dp.add_handler(CommandHandler("end_word_game",end_word_game))
         update.message.reply_text("Starting new game\nType /join_word_game to join.")
     else:
         update.message.reply_text("A game is already running")
