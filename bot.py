@@ -28,6 +28,7 @@ arr = arr + string.digits + "+,.-? "
 PORT = int(os.environ.get('PORT', 5000))
 count = 0
 odusername = os.environ.get("USER")
+dp = ""
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -628,7 +629,7 @@ You have to say a word starting with {(prev_word[len(prev_word)-1]).upper()}
         user_num = 0
 
 def new_word_game(bot,update):
-    global GROUP
+    global GROUP, dp
     group_id = update.message.chat_id
     if group_id not in group_lst:
         GROUP = group_id
@@ -645,6 +646,7 @@ def new_word_game(bot,update):
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 def main():
+    global dp
     """Start the bot."""
     
     # Create the Updater and pass it your bot's token.
