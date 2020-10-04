@@ -4,7 +4,6 @@ from telegram import Update, Bot
 from telegram.utils.helpers import mention_markdown
 import telegram
 import os
-
 import re
 import randfacts
 from bs4 import BeautifulSoup as bs4
@@ -53,7 +52,7 @@ def joke(bot,update):
 
 mybot = Bot(TOKEN)
 
-###########################################################################################################################################################################
+#######################################################################################################################################################################
 def getimg(case,col):
     global width,height,back
     img = cv2.imread(r"ChrImages\%s.png"%case)
