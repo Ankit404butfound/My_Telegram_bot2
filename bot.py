@@ -617,7 +617,7 @@ If you replied within first 'n' seconds you earn 20 - n points, *if you fail to 
 
     else:
         prev_word = used_word_lst[total_words-1]
-        time.sleep(3)
+        time.sleep(2)
         bot.sendMessage(GROUP,f"""*Round {round_com}*\n{mention_markdown(chat_id,name+"'s")} chance.\nPrevious word was *'{prev_word.upper()}'*
 You have to say a word starting with {(prev_word[len(prev_word)-1]).upper()}
 *Message like this* - /w THE WORD HERE.""",parse_mode="Markdown")
