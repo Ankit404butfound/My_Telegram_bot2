@@ -465,6 +465,7 @@ game_started = False
 start_time = 0
 end_time = 0
 user_point_dic = {}
+word_message_dic = {}
 
 def end_word_game(bot,update):
     global group_lst,GROUP,username_lst,chatid_lst,name_lst,whose_chance,used_word_lst,user_num,round_com,user_lst,game_started,start_time,end_time,user_point_dic
@@ -490,6 +491,7 @@ def end_word_game(bot,update):
     end_time = 0
     user_point_dic = {}
     group_lst = []
+    word_message_dic = {}
 
 
 def join_word_game(bot,update):
@@ -564,13 +566,15 @@ def word(bot,update):
                 bot.sendMessage(GROUP,text=f"{mention_markdown(chat_id,name)} chose '{message.upper()}' which is a valid English word\nThey earned {points} points.",parse_mode="Markdown")
                 score = user_point_dic[chat_id]
                 user_point_dic[chat_id] = points + score
+                word_message_dic[message] = update.message.message_id
                 print(user_point_dic)
                 end_time = 0
                 start_time = 0
                 used_word_lst.append(message.lower())
 
             elif message.lower() in used_word_lst:
-                bot.sendMessage(GROUP,text=f"{mention_markdown(chat_id,name)} chose '{message.upper()}' which has been used before\nThey loses 5 points.",parse_mode="Markdown")
+                msg_id = word_message_dic[message]                                      
+                bot.sendMessage(GROUP,text=f"{mention_markdown(chat_id,name)} chose '{message.upper()}' which has been used before\nThey loses 5 points.",parse_mode="Markdown",reply_to_message_id=msg_id)
                 score = user_point_dic[chat_id]
                 user_point_dic[chat_id] = score - 5
                 end_time = 0
@@ -591,12 +595,12 @@ def word(bot,update):
                 start_time = 0
 
         whose_chance = 0
-        final_score = ""
-        for i in range(len(chatid_lst)):
-            user = name_lst[i]
-            score = user_point_dic[chatid_lst[i]]
-            final_score = f"{final_score}\n{mention_markdown(chatid_lst[i],user)} : {score}"
-        bot.sendMessage(GROUP,final_score,parse_mode="Markdown")
+#         final_score = ""
+#         for i in range(len(chatid_lst)):
+#             user = name_lst[i]
+#             score = user_point_dic[chatid_lst[i]]
+#             final_score = f"{final_score}\n{mention_markdown(chatid_lst[i],user)} : {score}"
+#         bot.sendMessage(GROUP,final_score,parse_mode="Markdown")
         incriment(bot,update)
 
 def incriment(bot,update):
@@ -617,7 +621,13 @@ If you replied within first 'n' seconds you earn 20 - n points, *if you fail to 
     else:
         prev_word = used_word_lst[total_words-1]
         time.sleep(2)
-        bot.sendMessage(GROUP,f"""*Round {round_com}*\n{mention_markdown(chat_id,name+"'s")} chance.\nPrevious word was *'{prev_word.upper()}'*
+        final_score = ""
+        for i in range(len(chatid_lst)):
+            user = name_lst[i]
+            score = user_point_dic[chatid_lst[i]]
+            final_score = f"{final_score}\n{mention_markdown(chatid_lst[i],user)} : {score}"
+        bot.sendMessage(GROUP,final_score,parse_mode="Markdown")
+        bot.sendMessage(GROUP,f"""*Round {round_com}*\n{final_score}\n{mention_markdown(chat_id,name+"'s")} chance.\nPrevious word was *'{prev_word.upper()}'*
 You have to say a word starting with {(prev_word[len(prev_word)-1]).upper()}
 *Message like this* - /w THE WORD HERE.""",parse_mode="Markdown")
 
