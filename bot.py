@@ -278,6 +278,7 @@ def check_bday():
             updated_data = file.replace(f"Today : {last_checked_date}",f"Today : {str_date}")
             requests.get("http://rajma.pythonanywhere.com/retreve?uname=date&method=w&data="+updated_data)
             Todays_history()
+            daily_wed()
         time.sleep(300)
                                                       
 def answer_question(bot,update):
@@ -450,6 +451,82 @@ def echo(bot,update):#, context):
 ##    """Log Errors caused by Updates."""
 ##    pass
     #logger.warning('Update "%s" caused error "%s"', update, context.error)
+#Yfhujfsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsd
+def daily_wed(bot,update):
+    lst = requests.get("http://rajma.pythonanywhere.com/retreve?uname=WEATHERDATA&method=r").json()["data"]
+    for udata in lst:
+        loc = udata["city"]
+        GROUP = udata["grpid"]
+        print(udata["id"],loc)
+        data = requests.get(f"http://api.openweathermap.org/data/2.5/weather?q={loc}&appid=f6f3b5a297d4de6adfb22cf24fa6131f&units=metric").json()
+        info = f"""*CURRENT WEATHER IN* {mention_markdown(int(udata["id"]),loc.upper())}\n
+*Description*\n\t{data['weather'][0]['description'].title()}\n
+*Condition*\n\tTemp: {data['main']['temp']}°C\n\tFeels: {data['main']['feels_like']}°C\n\tPress: {data['main']['pressure']}Pa\n\tHumid: {data['main']['humidity']}%\n
+*Visib*: {int(data['visibility'])/1000}km
+*Wind*: {int(data['wind']['speed'])*3.6}km/h {data['wind']['deg']}° from North
+*Rain Prob*: {data['clouds']['all']}%"""
+        bot.sendMessage(GROUP,info,parse_mode="Markdown")
+    
+def add(bot,update):
+    data = requests.get("http://rajma.pythonanywhere.com/retreve?uname=WEATHERDATA&method=r").text
+    city = update.message.text.replace("/add_loc ","").lower()
+    cid = update.message.from_user.id
+    if city in data:
+        update.message.reply_text("LOCATION ALREADY ADDED!!!")
+    else:
+        try:
+            info = get_wed(city)
+            grpid = update.message.chat_id
+            data = data.replace("]}",""",{"id":"%s","city":"%s","grpid":"%s"}\n]}"""%(cid,city,grpid))
+            requests.get("http://rajma.pythonanywhere.com/retreve?uname=WEATHERDATA&method=w&data="+data)
+            update.message.reply_text(f"Congratulations, you have subscribed to receive daily weather updates of {city.title()}")
+            update.message.reply_text(info,parse_mode="Markdown")
+        except Exception as e:
+            print(e)
+            update.message.reply_text("*CITY NOT FOUND!!!*",parse_mode="Markdown")
+    
+
+def get_wed(loc,lang="en"):
+    data = requests.get(f"http://api.openweathermap.org/data/2.5/weather?q={loc}&appid=f6f3b5a297d4de6adfb22cf24fa6131f&units=metric&lang={lang}").json()
+    info = f"""*CURRENT WEATHER IN {loc.upper()}*\n
+*Description*\n\t{data['weather'][0]['description'].title()}\n
+*Condition*\n\tTemp: {data['main']['temp']}°C\n\tFeels: {data['main']['feels_like']}°C\n\tPress: {data['main']['pressure']}Pa\n\tHumid: {data['main']['humidity']}%\n
+*Visib*: {int(data['visibility'])/1000}km
+*Wind*: {int(data['wind']['speed'])*3.6}km/h {data['wind']['deg']}° from North
+*Rain Prob*: {data['clouds']['all']}%"""
+    return info
+
+def wed(bot,update):
+    loc = update.message.text
+    print(loc)
+    loc = loc.replace("/wed ","")
+    try:
+        info = get_wed(loc)
+        update.message.reply_text(info,parse_mode="Markdown")
+    except Exception as e:
+        print(e)
+        update.message.reply_text("*CITY NOT FOUND!!!*",parse_mode="Markdown")
+
+def forecast(bot,update):
+    alldata = update.message.text
+    alldata = alldata.replace("/fore ","")
+    loc = alldata.split()[0]
+    hour = alldata.split()[1]
+    try:
+        data = requests.get(f"http://api.openweathermap.org/data/2.5/forecast?q={loc}&appid=f6f3b5a297d4de6adfb22cf24fa6131f&units=metric").json()["list"]
+        data = data[int(hour)-1]
+        info = f"""*WEATHER IN {loc.upper()}*\n
+*Time*\n\t{data['dt_txt']}\n
+*Description*\n\t{data['weather'][0]['description'].title()}\n
+*Condition*\n\tTemp: {data['main']['temp']}°C\n\tFeels: {data['main']['feels_like']}°C\n\tPress: {data['main']['pressure']}Pa\n\tHumid: {data['main']['humidity']}%\n
+*Visib*: {int(data['visibility'])/1000}km
+*Wind*: {int(data['wind']['speed'])*3.6}km/h {data['wind']['deg']}° from North
+*Rain Prob*: {data['clouds']['all']}%"""
+        update.message.reply_text(info,parse_mode="Markdown")
+ 
+    except Exception as e:
+        print(e)
+        update.message.reply_text("*ERROR!!!*",parse_mode="Markdown")
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 group_lst = []
 GROUP = ""
@@ -876,7 +953,10 @@ def main():
     dp.add_handler(CommandHandler("tth", mytexttohand))
     dp.add_handler(CommandHandler('new_word_game', new_word_game))
     dp.add_handler(CommandHandler('new_math_game', new_math_game))
-                                                      
+    dp.add_handler(CommandHandler("wed", wed))
+    dp.add_handler(CommandHandler("fore", forecast))
+    dp.add_handler(CommandHandler("add_loc", add))
+    dp.add_handler(CommandHandler("t", daily_wed))                                                  
 
     # on noncommand i.e message - echo the message on Telegram
     #dp.add_handler(MessageHandler(Filters.text, echo))
