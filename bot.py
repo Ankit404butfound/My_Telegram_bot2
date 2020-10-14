@@ -703,8 +703,8 @@ If you replied within first 'n' seconds you earn 20 - n points, *if you fail to 
             user = name_lst[i]
             score = user_point_dic[chatid_lst[i]]
             final_score = f"{final_score}\n{mention_markdown(chatid_lst[i],user)} : {score}"
-        bot.sendMessage(GROUP,final_score,parse_mode="Markdown")
-        bot.sendMessage(GROUP,f"""*Round {round_com}*\n{final_score}\n{mention_markdown(chat_id,name+"'s")} chance.\nPrevious word was *'{prev_word.upper()}'*
+        #bot.sendMessage(GROUP,final_score,parse_mode="Markdown")
+        bot.sendMessage(GROUP,f"""*Game count {round_com}*\n\n*Final Score*\n{final_score}\n\n{mention_markdown(chat_id,name+"'s")} chance.\n\nPrevious word was *'{prev_word.upper()}'*
 You have to say a word starting with {(prev_word[len(prev_word)-1]).upper()}
 *Message like this* - /w THE WORD HERE.""",parse_mode="Markdown")
 
