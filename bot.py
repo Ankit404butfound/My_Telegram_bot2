@@ -249,7 +249,22 @@ def add_bday(bot,update):
     except Exception as e:
         update.message.reply_text("@Tag_Kiya_kya see, your friend is not providing correct date format.\n(Error message : %s)"%str(e))
 
-
+def daily_wed(bot,update):
+    lst = requests.get("http://rajma.pythonanywhere.com/retreve?uname=WEATHERDATA&method=r").json()["data"]
+    for udata in lst:
+        loc = udata["city"]
+        GROUP = udata["grpid"]
+        print(udata["id"],loc)
+        data = requests.get(f"http://api.openweathermap.org/data/2.5/weather?q={loc}&appid=f6f3b5a297d4de6adfb22cf24fa6131f&units=metric").json()
+        info = f"""*CURRENT WEATHER IN* {mention_markdown(int(udata["id"]),loc.upper())}\n
+*Description*\n\t{data['weather'][0]['description'].title()}\n
+*Condition*\n\tTemp: {data['main']['temp']}°C\n\tFeels: {data['main']['feels_like']}°C\n\tPress: {data['main']['pressure']}Pa\n\tHumid: {data['main']['humidity']}%\n
+*Visib*: {int(data['visibility'])/1000}km
+*Wind*: {int(data['wind']['speed'])*3.6}km/h {data['wind']['deg']}° from North
+*Rain Prob*: {data['clouds']['all']}%"""
+        bot.sendMessage(GROUP,info,parse_mode="Markdown")
+                                  
+                                  
 def check_bday():
     while True:
         file = requests.get("http://rajma.pythonanywhere.com/retreve?uname=date&method=r").text
@@ -452,20 +467,7 @@ def echo(bot,update):#, context):
 ##    pass
     #logger.warning('Update "%s" caused error "%s"', update, context.error)
 #Yfhujfsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsd
-def daily_wed(bot,update):
-    lst = requests.get("http://rajma.pythonanywhere.com/retreve?uname=WEATHERDATA&method=r").json()["data"]
-    for udata in lst:
-        loc = udata["city"]
-        GROUP = udata["grpid"]
-        print(udata["id"],loc)
-        data = requests.get(f"http://api.openweathermap.org/data/2.5/weather?q={loc}&appid=f6f3b5a297d4de6adfb22cf24fa6131f&units=metric").json()
-        info = f"""*CURRENT WEATHER IN* {mention_markdown(int(udata["id"]),loc.upper())}\n
-*Description*\n\t{data['weather'][0]['description'].title()}\n
-*Condition*\n\tTemp: {data['main']['temp']}°C\n\tFeels: {data['main']['feels_like']}°C\n\tPress: {data['main']['pressure']}Pa\n\tHumid: {data['main']['humidity']}%\n
-*Visib*: {int(data['visibility'])/1000}km
-*Wind*: {int(data['wind']['speed'])*3.6}km/h {data['wind']['deg']}° from North
-*Rain Prob*: {data['clouds']['all']}%"""
-        bot.sendMessage(GROUP,info,parse_mode="Markdown")
+
     
 def add(bot,update):
     data = requests.get("http://rajma.pythonanywhere.com/retreve?uname=WEATHERDATA&method=r").text
