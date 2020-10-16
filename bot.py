@@ -249,7 +249,7 @@ def add_bday(bot,update):
     except Exception as e:
         update.message.reply_text("@Tag_Kiya_kya see, your friend is not providing correct date format.\n(Error message : %s)"%str(e))
 
-def daily_wed(bot,update):
+def daily_wed():
     lst = requests.get("http://rajma.pythonanywhere.com/retreve?uname=WEATHERDATA&method=r").json()["data"]
     for udata in lst:
         loc = udata["city"]
