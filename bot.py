@@ -262,7 +262,7 @@ def daily_wed(bot,update):
 *Visib*: {int(data['visibility'])/1000}km
 *Wind*: {int(data['wind']['speed'])*3.6}km/h {data['wind']['deg']}° from North
 *Rain Prob*: {data['clouds']['all']}%"""
-        bot.sendMessage(GROUP,info,parse_mode="Markdown")
+        mybot.sendMessage(GROUP,info,parse_mode="Markdown")
                                   
                                   
 def check_bday():
