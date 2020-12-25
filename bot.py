@@ -20,6 +20,7 @@ import numpy as np
 from PIL import Image
 import cv2
 import string
+import sys
 #import enchant
 
 arr = string.ascii_letters
@@ -965,12 +966,13 @@ def main():
 
     # log all errors
     #dp.add_error_handler(error)
-##    updater.start_polling()
-    # Start the Bot
-    updater.start_webhook(listen="0.0.0.0",
-                          port=int(PORT),
-                          url_path=TOKEN)
-    updater.bot.setWebhook('https://rajmatelebot.herokuapp.com/' + TOKEN)
+    if len(sys.argv)>1 and sys.argv[1]=="-p":
+      updater.start_polling()
+    else:
+      updater.start_webhook(listen="0.0.0.0",
+                            port=int(PORT),
+                            url_path=TOKEN)
+      updater.bot.setWebhook('https://rajmatelebot.herokuapp.com/' + TOKEN)
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
