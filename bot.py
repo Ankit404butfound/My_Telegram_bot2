@@ -600,6 +600,8 @@ class WordGame:
       
 WORD_GAMES ={}
 
+WORD_GAME_FILTER_1 =Filters.chat()
+WORD_GAME_FILTER_2 =Filters.chat()
 def end_word_game(bot,update):
     group_id = update.message.chat_id
     game = WORD_GAMES[group_id]
@@ -607,6 +609,8 @@ def end_word_game(bot,update):
     bot.sendMessage(group_id,"Game ENDED!!!")
     bot.sendMessage(group_id,game.final_score(),parse_mode="Markdown")
     WORD_GAMES.pop(group_id)
+    WORD_GAME_FILTER_1.remove_chat_ids(group_id)
+    WORD_GAME_FILTER_2.remove_chat_ids(group_id)
     del(game)
 
 def join_word_game(bot,update):
@@ -629,6 +633,7 @@ def start_word_game(bot,update):
         if game.total_players > 1:
             bot.sendMessage(update.message.chat_id,f"Starting a game with {game.total_players} players")
             game.start()
+            WORD_GAME_FILTER_2.add_chat_ids(group_id)
             incriment(bot=bot,update=update)
         else:
              update.message.reply_text("Game must have atleast 2 players.")
@@ -708,7 +713,6 @@ You will have 20 seconds to reply, the points you earn will be determined by how
 If you replied within first 'n' seconds you earn 20 - n points, *if you fail to reply, type '/w pass', you will lose 5 points*.""",parse_mode="Markdown")
         game.used_words.push("python")
         game.start_time=time.time()
-        print("Start ",self.start_time)
     else:
         print(game.used_words)
         prev_word = game.prev_word()
@@ -728,10 +732,7 @@ def new_word_game(bot,update):
         #group_lst.append(group_id)
         game = WordGame(group_id)
         WORD_GAMES[group_id] = game
-        dp.add_handler(CommandHandler("join_word_game",join_word_game))
-        dp.add_handler(CommandHandler("start_word_game",start_word_game))
-        dp.add_handler(CommandHandler("w",word))
-        dp.add_handler(CommandHandler("end_word_game",end_word_game))
+        WORD_GAME_FILTER_1.add_chat_ids(group_id)
         update.message.reply_text("Starting new game\nType /join_word_game to join.")
     else:
         update.message.reply_text("A game is already running")
@@ -960,6 +961,11 @@ def main():
     dp.add_handler(CommandHandler("temme", answer_question))
     dp.add_handler(CommandHandler("tth", mytexttohand))
     dp.add_handler(CommandHandler('new_word_game', new_word_game, Filters.chat_type.groups))
+    dp.add_handler(CommandHandler("join_word_game",join_word_game,WORD_GAME_FILTER_1))
+    dp.add_handler(CommandHandler("start_word_game",start_word_game,WORD_GAME_FILTER_1))
+    dp.add_handler(CommandHandler("w",word,WORD_GAME_FILTER_2))
+    dp.add_handler(CommandHandler("end_word_game",end_word_game,WORD_GAME_FILTER_2))
+
     dp.add_handler(CommandHandler('new_math_game', new_math_game,Filters.chat_type.groups))
     dp.add_handler(CommandHandler("wed", wed))
     dp.add_handler(CommandHandler("fore", forecast))
