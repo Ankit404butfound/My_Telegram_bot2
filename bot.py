@@ -20,6 +20,7 @@ import numpy as np
 from PIL import Image
 import cv2
 import string
+import sys
 #import enchant
 
 arr = string.ascii_letters
@@ -529,150 +530,164 @@ def forecast(bot,update):
         print(e)
         update.message.reply_text("*ERROR!!!*",parse_mode="Markdown")
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-group_lst = []
-GROUP = ""
-username_lst = []
-chatid_lst = []
-name_lst = []
-whose_chance = 0
-used_word_lst = []
-user_num = 0
-round_com = 1
-user_lst = []
-game_started = False
-start_time = 0
-end_time = 0
-user_point_dic = {}
-word_message_dic = {}
 
+class Stack:
+  def __init__(self):
+    self._stack=[]
+    self.top=-1
+  def push(self,x):
+    self.top+=1
+    self._stack.append(x)
+  def peek(self):
+    return self._stack[self.top]
+  def size(self):
+    return len(self._stack)
+  def contains(self,x):
+    return any(x==y for y in self._stack)
+class Player:
+  def __init__(self, player):
+    self.name=player.first_name
+    self.username = player.username
+    self.id = player.id
+    self.score = 0
+  
+  def mention(self):
+    return mention_markdown(self.id,self.name)
+    
+  def update_score(self, points):
+    self.score+=points
+    
+class WordGame:
+  def __init__(self,group_id):
+    self.group_id=group_id
+    self.players = []
+    self.total_players = 0
+    self.started = False
+  def join(self,player):
+    self.players.append(player)
+    self.total_players+=1
+  def start(self):
+    self.whose_chance = self.players[0]
+    self.used_words = Stack()
+    self.round = 1
+    self.started = True
+    self.start_time = 0 
+    self.end_time = 0
+  def prev_word(self):
+    return self.used_words.peek()
+  def notJoined(self,user):
+    for player in self.players:
+      if user.id==player.id:
+        return False
+    return True
+   
+  def final_score(self):
+    text = ""
+    for player in self.players:
+       text = f"{text}\n{player.mention()} : {player.score}"
+    return text
+    
+  def next_round(self):
+    self.round+=1
+    self.whose_chance = self.next_player()
+    
+  def next_player(self):
+    curr_index  = self.players.index(self.whose_chance)
+    if  curr_index== len(self.players)-1 :
+      return self.players[0]
+    else:
+      return self.players[curr_index+1]
+      
+WORD_GAMES ={}
+
+WORD_GAME_FILTER_1 =Filters.chat()
+WORD_GAME_FILTER_2 =Filters.chat()
 def end_word_game(bot,update):
-    global group_lst,GROUP,username_lst,chatid_lst,name_lst,whose_chance,used_word_lst,user_num,round_com,user_lst,game_started,start_time,end_time,user_point_dic
-
+    group_id = update.message.chat_id
+    game = WORD_GAMES[group_id]
     final_score = "Final score is as followed"
-    bot.sendMessage(GROUP,"Game ENDED!!!")
-    for i in range(len(chatid_lst)):
-        user = name_lst[i]
-        score = user_point_dic[chatid_lst[i]]
-        final_score = f"{final_score}\n{mention_markdown(chatid_lst[i],user)} : {score}"
-    bot.sendMessage(GROUP,final_score,parse_mode="Markdown")
-    GROUP = ""
-    username_lst = []
-    chatid_lst = []
-    name_lst = []
-    whose_chance = 0
-    used_word_lst = []
-    user_num = 0
-    round_com = 1
-    user_lst = []
-    game_started = False
-    start_time = 0
-    end_time = 0
-    user_point_dic = {}
-    group_lst = []
-    word_message_dic = {}
-
+    bot.sendMessage(group_id,"Game ENDED!!!")
+    bot.sendMessage(group_id,game.final_score(),parse_mode="Markdown")
+    WORD_GAMES.pop(group_id)
+    WORD_GAME_FILTER_1.remove_chat_ids(group_id)
+    WORD_GAME_FILTER_2.remove_chat_ids(group_id)
+    del(game)
 
 def join_word_game(bot,update):
-    username = update.message.from_user.username
-    name = update.message.from_user.first_name
+    user = update.message.from_user
     chat_id = update.message.from_user.id
-    if chat_id not in chatid_lst:
-        user_lst.append(f"{name}:{username}:{chat_id}")
-        username_lst.append(username)
-        chatid_lst.append(chat_id)
-        name_lst.append(name)
-        user_point_dic[chat_id] = 0
-        bot.sendMessage(GROUP,text=f"{mention_markdown(chat_id,name)} joined the game, there are currently {len(user_lst)} players.",parse_mode="Markdown")
+    game = WORD_GAMES[update.message.chat_id]
+    if game.notJoined(user):
+        player = Player(user)
+        game.join(player)
+        bot.sendMessage(update.message.chat_id,text=f"{player.mention()} joined the game, there are currently {game.total_players} players.",parse_mode="Markdown")
 
     else:
         update.message.reply_text("You have already joined the game")
 
 
 def start_word_game(bot,update):
-    global game_started
-    total_players = len(user_lst)
-
-    if not game_started:
-    
-        if total_players > 1:
-            bot.sendMessage(GROUP,f"Starting a game with {total_players} players")
-            game_started = True
+    group_id=update.message.chat_id
+    game=WORD_GAMES[group_id]
+    if not game.started:
+        if game.total_players > 1:
+            bot.sendMessage(update.message.chat_id,f"Starting a game with {game.total_players} players")
+            game.start()
+            WORD_GAME_FILTER_2.add_chat_ids(group_id)
             incriment(bot=bot,update=update)
-
         else:
              update.message.reply_text("Game must have atleast 2 players.")
-
     else:
         update.message.reply_text("Game has already started")
 
-
 def word(bot,update):
-    global group_lst,GROUP,username_lst,chatid_lst,name_lst,whose_chance,used_word_lst,user_num,round_com,user_lst,game_started,start_time,end_time,user_point_dic
     chat_id = update.message.from_user.id
+    group_id = update.message.chat_id
+    game = WORD_GAMES[group_id]
+    player = game.whose_chance
     name = update.message.from_user.first_name
-    if whose_chance == chat_id:
+    if player.id == chat_id:
         end_time = time.time()
-        total_time = end_time - start_time
+        total_time = end_time - game.start_time
         message = update.message.text
         message = message.replace("/w ","")
         message = message.lower()
         total_time = round(total_time)
+        print(total_time)
         points = 20 - total_time
         print(points)
         if message == "_pass":
-            bot.sendMessage(GROUP,text=f"{mention_markdown(chat_id,name)} loses 5 points.",parse_mode="Markdown")
-            score = user_point_dic[chat_id]
-            user_point_dic[chat_id] = score - 5
-            end_time = 0
-            start_time = 0
+            bot.sendMessage(update.message.chat_id,text=f"{player.mention()} loses 5 points.",parse_mode="Markdown")
+            player.update_score(-5)
 
-        elif points < 0:
-            bot.sendMessage(GROUP,text=f"{mention_markdown(chat_id,name)} loses 5 points as 20 seconds have passed.",parse_mode="Markdown")
-            score = user_point_dic[chat_id]
-            user_point_dic[chat_id] = score - 5
-            end_time = 0
-            start_time = 0
-            
+        elif points <=0:
+            bot.sendMessage(update.message.chat_id,text=f"{mention_markdown(chat_id,name)} loses 5 points as 20 seconds have passed.",parse_mode="Markdown")
+            player.update_score(-5)
+           
         else:
-            total_words = len(used_word_lst)
-            prev_word = used_word_lst[total_words-1]
-            prev_let = prev_word[len(prev_word)-1]
+            prev_word = game.prev_word()
+            prev_let = prev_word[-1]
             print(message[0])
             word_check = requests.get("http://rajma.pythonanywhere.com/check?word="+message).text
-            print(f"{word_check} {message[0]} {prev_let} {used_word_lst}")
-            if word_check == "True" and message[0] == prev_let and message.lower() not in used_word_lst:
-                bot.sendMessage(GROUP,text=f"{mention_markdown(chat_id,name)} chose '{message.upper()}' which is a valid English word\nThey earned {points} points.",parse_mode="Markdown")
-                score = user_point_dic[chat_id]
-                user_point_dic[chat_id] = points + score
-                word_message_dic[message] = update.message.message_id
+            print(f"{word_check} {message[0]} {prev_let} {game.used_words}")
+            if word_check == "True" and message[0] == prev_let and not game.used_words.contains(message):
+                bot.sendMessage(update.message.chat_id,text=f"{player.mention()} chose '{message.upper()}' which is a valid English word\nThey earned {points} points.",parse_mode="Markdown")
+                player.update_score(points)
                 print(user_point_dic)
-                end_time = 0
-                start_time = 0
-                used_word_lst.append(message.lower())
+                game.used_words.push(message.lower())
 
-            elif message.lower() in used_word_lst:
-                msg_id = word_message_dic[message]                                      
-                bot.sendMessage(GROUP,text=f"{mention_markdown(chat_id,name)} chose '{message.upper()}' which has been used before\nThey loses 5 points.",parse_mode="Markdown",reply_to_message_id=msg_id)
-                score = user_point_dic[chat_id]
-                user_point_dic[chat_id] = score - 5
-                end_time = 0
-                start_time = 0
+            elif message.lower() in game.used_words:
+                bot.sendMessage(update.message.chat_id,text=f"{player.mention()} chose '{message.upper()}' which has been used before\nThey loses 5 points.",parse_mode="Markdown",reply_to_message_id=msg_id)
+                player.update_score(-5)
 
             elif message[0] != prev_let :
-                bot.sendMessage(GROUP,text=f"{mention_markdown(chat_id,name)} chose '{message.upper()}' which does *not* start with '{prev_let.upper()}'\nThey loses {points} points.",parse_mode="Markdown")
-                score = user_point_dic[chat_id]
-                user_point_dic[chat_id] = score - points
-                end_time = 0
-                start_time = 0
+                bot.sendMessage(update.message.chat_id,text=f"{mention_markdown(chat_id,name)} chose '{message.upper()}' which does *not* start with '{prev_let.upper()}'\nThey loses {points} points.",parse_mode="Markdown")
+                player.update_score(points)
 
             else:
-                bot.sendMessage(GROUP,text=f"{mention_markdown(chat_id,name)} chose '{message.upper()}' which is *not* a valid English word\nThey loses {points} points.",parse_mode="Markdown")
-                score = user_point_dic[chat_id]
-                user_point_dic[chat_id] = score - points
-                end_time = 0
-                start_time = 0
-
-        whose_chance = 0
+                bot.sendMessage(update.message.chat_id,text=f"{mention_markdown(chat_id,name)} chose '{message.upper()}' which is *not* a valid English word\nThey loses {points} points.",parse_mode="Markdown")
+                player.update_score(-1*round(points))
+        game.next_round()
 #         final_score = ""
 #         for i in range(len(chatid_lst)):
 #             user = name_lst[i]
@@ -682,49 +697,42 @@ def word(bot,update):
         incriment(bot,update)
 
 def incriment(bot,update):
-    global whose_chance, start_time, user_num, round_com
-    name = name_lst[user_num]
-    chat_id = chatid_lst[user_num]
+    group_id = update.message.chat_id
+    game = WORD_GAMES[group_id]
+    player=game.whose_chance
+    #name = name_lst[user_num]
+  #  chat_id = chatid_lst[user_num]
     #bot.sendMessage(GROUP,f"""*Round {round}*\n{mention_markdown(chat_id,name+"'s")} chance.""",parse_mode="Markdown")
-    total_words = len(used_word_lst)
-    whose_chance = chat_id
-    if total_words < 1:
-        bot.sendMessage(GROUP,f"""*Round {round_com}*\n{mention_markdown(chat_id,name+"'s")} chance.
-Starting word is 'PYTHON', {mention_markdown(chat_id,name)} you have to say a word starting with 'N'
+  #  total_words = len(used_word_lst)
+    #whose_chance = chat_id
+    if game.round==1:
+        bot.sendMessage(update.message.chat_id,f"""*Round {game.round}*\n{player.mention()}'s chance.
+Starting word is 'PYTHON', {player.mention()} you have to say a word starting with 'N'
 *Message like this* - /w THE WORD HERE.
 You will have 20 seconds to reply, the points you earn will be determined by how fast you replied.
 If you replied within first 'n' seconds you earn 20 - n points, *if you fail to reply, type '/w pass', you will lose 5 points*.""",parse_mode="Markdown")
-        used_word_lst.append("python")
-
+        game.used_words.push("python")
+        game.start_time=time.time()
     else:
-        prev_word = used_word_lst[total_words-1]
+        print(game.used_words)
+        prev_word = game.prev_word()
         time.sleep(2)
-        final_score = ""
-        for i in range(len(chatid_lst)):
-            user = name_lst[i]
-            score = user_point_dic[chatid_lst[i]]
-            final_score = f"{final_score}\n{mention_markdown(chatid_lst[i],user)} : {score}"
-        #bot.sendMessage(GROUP,final_score,parse_mode="Markdown")
-        bot.sendMessage(GROUP,f"""*Game count {round_com}*\n\n*Final Score*\n{final_score}\n\n{mention_markdown(chat_id,name+"'s")} chance.\n\nPrevious word was *'{prev_word.upper()}'*
+        final_score = game.final_score()
+        bot.sendMessage(update.message.chat_id,f"""*Game count {game.round}*\n\n*Final Score*\n{final_score}\n\n{player.mention()}'s chance.\n\nPrevious word was *'{prev_word.upper()}'*
 You have to say a word starting with {(prev_word[len(prev_word)-1]).upper()}
 *Message like this* - /w THE WORD HERE.""",parse_mode="Markdown")
-
     start_time = time.time()
-    user_num = user_num+1
-    round_com = round_com+1
-    if len(chatid_lst)-1 < user_num:
-        user_num = 0
-
+    
 def new_word_game(bot,update):
-    global GROUP, dp
+    global dp
     group_id = update.message.chat_id
-    if group_id not in group_lst:
-        GROUP = group_id
-        group_lst.append(group_id)
-        dp.add_handler(CommandHandler("join_word_game",join_word_game))
-        dp.add_handler(CommandHandler("start_word_game",start_word_game))
-        dp.add_handler(CommandHandler("w",word))
-        dp.add_handler(CommandHandler("end_word_game",end_word_game))
+    
+    if group_id not in WORD_GAMES.keys():
+        #GROUP = group_id
+        #group_lst.append(group_id)
+        game = WordGame(group_id)
+        WORD_GAMES[group_id] = game
+        WORD_GAME_FILTER_1.add_chat_ids(group_id)
         update.message.reply_text("Starting new game\nType /join_word_game to join.")
     else:
         update.message.reply_text("A game is already running")
@@ -936,7 +944,7 @@ def main():
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater(TOKEN)#, use_context=True)
+    updater = Updater(TOKEN , use_context=False)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
@@ -952,25 +960,31 @@ def main():
     dp.add_handler(CommandHandler("todays_significance", Todays_history))
     dp.add_handler(CommandHandler("temme", answer_question))
     dp.add_handler(CommandHandler("tth", mytexttohand))
-    dp.add_handler(CommandHandler('new_word_game', new_word_game))
-    dp.add_handler(CommandHandler('new_math_game', new_math_game))
+    dp.add_handler(CommandHandler('new_word_game', new_word_game, Filters.chat_type.groups))
+    dp.add_handler(CommandHandler("join_word_game",join_word_game,WORD_GAME_FILTER_1))
+    dp.add_handler(CommandHandler("start_word_game",start_word_game,WORD_GAME_FILTER_1))
+    dp.add_handler(CommandHandler("w",word,WORD_GAME_FILTER_2))
+    dp.add_handler(CommandHandler("end_word_game",end_word_game,WORD_GAME_FILTER_2))
+
+    dp.add_handler(CommandHandler('new_math_game', new_math_game,Filters.chat_type.groups))
     dp.add_handler(CommandHandler("wed", wed))
     dp.add_handler(CommandHandler("fore", forecast))
     dp.add_handler(CommandHandler("add_loc", add))
     dp.add_handler(CommandHandler("t", daily_wed))                                                  
 
     # on noncommand i.e message - echo the message on Telegram
-    dp.add_handler(MessageHandler(Filters.text, echo))
+    dp.add_handler(MessageHandler(Filters.text&(~Filters.command), echo))
                                                       
 
     # log all errors
     #dp.add_error_handler(error)
-##    updater.start_polling()
-    # Start the Bot
-    updater.start_webhook(listen="0.0.0.0",
-                          port=int(PORT),
-                          url_path=TOKEN)
-    updater.bot.setWebhook('https://rajmatelebot.herokuapp.com/' + TOKEN)
+    if len(sys.argv)>1 and sys.argv[1]=="-p":
+      updater.start_polling()
+    else:
+      updater.start_webhook(listen="0.0.0.0",
+                            port=int(PORT),
+                            url_path=TOKEN)
+      updater.bot.setWebhook('https://rajmatelebot.herokuapp.com/' + TOKEN)
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
