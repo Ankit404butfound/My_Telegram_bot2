@@ -600,8 +600,8 @@ class WordGame:
       
 WORD_GAMES ={}
 
-WORD_GAME_FILTER_1 =Filters.chat()
-WORD_GAME_FILTER_2 =Filters.chat()
+WORD_GAME_FILTER_1 =Filters.chat(-1234)
+WORD_GAME_FILTER_2 =Filters.chat(-1234)
 def end_word_game(bot,update):
     group_id = update.message.chat_id
     game = WORD_GAMES[group_id]
@@ -964,7 +964,7 @@ def main():
     dp.add_handler(CommandHandler("join_word_game",join_word_game,WORD_GAME_FILTER_1))
     dp.add_handler(CommandHandler("start_word_game",start_word_game,WORD_GAME_FILTER_1))
     dp.add_handler(CommandHandler("w",word,WORD_GAME_FILTER_2))
-    dp.add_handler(CommandHandler("end_word_game",end_word_game,WORD_GAME_FILTER_2))
+    dp.add_handler(CommandHandler("end_word_game",end_word_game,WORD_GAME_FILTER_1))
 
     dp.add_handler(CommandHandler('new_math_game', new_math_game,Filters.chat_type.groups))
     dp.add_handler(CommandHandler("wed", wed))
