@@ -1,0 +1,16 @@
+hi : Hello there
+how are you : I am fine Thank you
+how do you do : I am fine Thank you
+awesome : Glad you liked it
+thank you : You're welcome
+your name : My name is AnkitBot
+wow : Thank you :-)
+your creator : My creator is Ankit Raj Mahapatra
+hello : Hi there.
+birthday : I don't know, maybe 31st June.
+favourite season : Winter
+favourite person : You :-)
+your phone number : 101100100001101011000011010110001100100101011011001000011011010101010010101010101
+wonderful : Glag you liked it.
+do you like me : Why wouldn't I?
+/start : Hello there!
