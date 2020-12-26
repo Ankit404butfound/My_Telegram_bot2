@@ -961,7 +961,7 @@ def main():
     dp.add_handler(CommandHandler("t", daily_wed))                                                  
 
     # on noncommand i.e message - echo the message on Telegram
-    dp.add_handler(MessageHandler(Filters.text, echo))
+    dp.add_handler(MessageHandler(Filters.text&(~Filters.command), echo))
                                                       
 
     # log all errors
